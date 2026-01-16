@@ -1,0 +1,122 @@
+
+@import './styles/theme.css';
+@import './styles/animations.css';
+@import './styles/responsive.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[var(--bg-primary)] text-[var(--text-primary)];
+    font-family: var(--font-primary);
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color var(--transition-normal), color var(--transition-normal);
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-[var(--text-primary)] font-semibold tracking-tight;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+  }
+}
+
+@layer utilities {
+  .card-hover {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+/* Calendar Overrides for New Theme */
+.rbc-calendar {
+  font-family: var(--font-primary) !important;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-md);
+}
+
+.rbc-header {
+  padding: 12px 4px !important;
+  font-weight: 600 !important;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.rbc-month-view {
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md);
+}
+
+.rbc-month-row {
+  border-top: 1px solid var(--border-color) !important;
+}
+
+.rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid var(--border-color) !important;
+}
+
+.rbc-off-range-bg {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.rbc-today {
+  background-color: rgba(99, 102, 241, 0.1) !important; /* Indigo-100 equivalent */
+}
+
+.rbc-event {
+  border-radius: var(--radius-sm) !important;
+  padding: 2px 6px !important;
+  box-shadow: var(--shadow-sm);
+  font-weight: 500;
+}
+
+.rbc-toolbar button {
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  font-size: 0.875rem !important;
+  transition: all var(--transition-fast) !important;
+}
+
+.rbc-toolbar button:hover {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.rbc-toolbar button.rbc-active {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  border-color: var(--primary-color) !important;
+}

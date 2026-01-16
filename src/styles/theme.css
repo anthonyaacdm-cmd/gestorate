@@ -1,0 +1,66 @@
+
+:root {
+  /* Colors - Premium Palette */
+  --primary-color: #6366F1; /* Indigo */
+  --primary-hover: #4F46E5;
+  --secondary-color: #EC4899; /* Pink */
+  --secondary-hover: #DB2777;
+  --accent-color: #F59E0B; /* Amber */
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --error-color: #EF4444;
+  --info-color: #3B82F6;
+
+  /* Neutrals & Backgrounds (Light Mode Default) */
+  --bg-primary: #F8FAFC; /* Slate-50 */
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F1F5F9; /* Slate-100 */
+  --text-primary: #0F172A; /* Slate-900 */
+  --text-secondary: #64748B; /* Slate-500 */
+  --text-muted: #94A3B8; /* Slate-400 */
+  --border-color: #E2E8F0; /* Slate-200 */
+  --border-hover: #CBD5E1; /* Slate-300 */
+
+  /* Typography */
+  --font-primary: 'Poppins', sans-serif;
+  --font-secondary: 'Inter', sans-serif;
+
+  /* Spacing Scale */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Overrides */
+.dark {
+  --bg-primary: #0F172A; /* Slate-900 */
+  --bg-secondary: #1E293B; /* Slate-800 */
+  --bg-tertiary: #334155; /* Slate-700 */
+  --text-primary: #F8FAFC; /* Slate-50 */
+  --text-secondary: #CBD5E1; /* Slate-300 */
+  --text-muted: #94A3B8; /* Slate-400 */
+  --border-color: #334155; /* Slate-700 */
+  --border-hover: #475569; /* Slate-600 */
+}
