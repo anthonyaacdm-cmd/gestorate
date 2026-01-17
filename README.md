@@ -38,5 +38,5 @@ Bem-vindo ao repositório do **Gestorate**! Este é um sistema robusto e moderno
 
 ### Passos para Configuração
 
-1.  **Clone o repositório:**
+1.  **Clone o repositório:** 
     
