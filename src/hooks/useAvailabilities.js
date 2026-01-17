@@ -1,162 +1,75 @@
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
-import { useState, useCallback } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/customSupabaseClient';
-import { useToast } from '@/components/ui/use-toast';
-
-export const useAvailabilities = () => {
+/**
+ * Carrega disponibilidades do "provider" (master/admin).
+ * - Master/Admin: vê e gerencia as próprias disponibilidades (admin_id = auth.uid()).
+ * - Usuário comum: vê disponibilidades do MASTER definido em VITE_MASTER_USER_ID.
+ *
+ * Retorna SEMPRE arrays (nunca undefined) para evitar tela branca.
+ */
+export function useAvailabilities(currentUser) {
   const [availabilities, setAvailabilities] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useAuth();
-  const { toast } = useToast();
 
-  const getAvailabilities = useCallback(async () => {
-    if (!user?.id) return;
-    
-    setLoading(true);
-    setError(null);
-    try {
-      const { data, error: apiError } = await supabase
-        .from('availabilities')
-        .select('*')
-        .eq('admin_id', user.id)
-        .order('day_of_week', { ascending: true })
-        .order('start_time', { ascending: true });
+  const masterId = import.meta.env.VITE_MASTER_USER_ID;
 
-      if (apiError) throw apiError;
-      setAvailabilities(data || []);
-    } catch (err) {
-      setError(err.message);
-      toast({
-        title: "Erro ao carregar disponibilidades",
-        description: err.message,
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [user, toast]);
+  const role = useMemo(() => currentUser?.role ?? null, [currentUser]);
+  const uid = useMemo(() => currentUser?.id ?? null, [currentUser]);
 
-  const createAvailability = async (data) => {
-    if (!user?.id) return { success: false, error: 'User not authenticated' };
-    
-    setLoading(true);
-    try {
-      const { data: newAvail, error: apiError } = await supabase
-        .from('availabilities')
-        .insert([{
-          ...data,
-          admin_id: user.id,
-          active: true
-        }])
-        .select()
-        .single();
-      
-      if (apiError) throw apiError;
-      
-      setAvailabilities(prev => [...prev, newAvail]);
-      return { success: true, data: newAvail };
-    } catch (err) {
-      toast({
-        title: "Erro ao criar",
-        description: err.message,
-        variant: "destructive"
-      });
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  };
+  const providerId = useMemo(() => {
+    if (role === "master" || role === "admin") return uid;     // gerencia o próprio
+    return masterId || null;                                    // usuário comum enxerga do master
+  }, [role, uid, masterId]);
 
-  const updateAvailability = async (id, updates) => {
-    setLoading(true);
-    try {
-      const { data: updatedAvail, error: apiError } = await supabase
-        .from('availabilities')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', id)
-        .select()
-        .single();
+  useEffect(() => {
+    let mounted = true;
 
-      if (apiError) throw apiError;
+    async function load() {
+      setLoading(true);
+      setError(null);
 
-      setAvailabilities(prev => prev.map(a => a.id === id ? updatedAvail : a));
-      return { success: true, data: updatedAvail };
-    } catch (err) {
-      toast({
-        title: "Erro ao atualizar",
-        description: err.message,
-        variant: "destructive"
-      });
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        if (!providerId) {
+          // Sem provider definido => não quebra a tela
+          if (mounted) setAvailabilities([]);
+          return;
+        }
 
-  const toggleAvailability = async (id, currentStatus) => {
-    // Optimistic update
-    setAvailabilities(prev => prev.map(a => a.id === id ? { ...a, active: !currentStatus } : a));
-    
-    try {
-      const { error: apiError } = await supabase
-        .from('availabilities')
-        .update({
-          active: !currentStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', id);
+        const { data, error: err } = await supabase
+          .from("availabilities")
+          .select("*")
+          .eq("admin_id", providerId)
+          .eq("active", true)
+          .order("day_of_week", { ascending: true })
+          .order("start_time", { ascending: true });
 
-      if (apiError) {
-        // Revert on error
-        setAvailabilities(prev => prev.map(a => a.id === id ? { ...a, active: currentStatus } : a));
-        throw apiError;
+        if (err) throw err;
+
+        if (mounted) setAvailabilities(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.error("useAvailabilities error:", e);
+        if (mounted) {
+          setAvailabilities([]); // nunca deixa undefined
+          setError(e);
+        }
+      } finally {
+        if (mounted) setLoading(false);
       }
-      return { success: true };
-    } catch (err) {
-      toast({
-        title: "Erro ao alterar status",
-        description: err.message,
-        variant: "destructive"
-      });
-      return { success: false, error: err.message };
     }
-  };
 
-  const deleteAvailability = async (id) => {
-    try {
-      const { error: apiError } = await supabase
-        .from('availabilities')
-        .delete()
-        .eq('id', id);
+    load();
 
-      if (apiError) throw apiError;
-
-      setAvailabilities(prev => prev.filter(a => a.id !== id));
-      return { success: true };
-    } catch (err) {
-      toast({
-        title: "Erro ao deletar",
-        description: err.message,
-        variant: "destructive"
-      });
-      return { success: false, error: err.message };
-    }
-  };
+    return () => {
+      mounted = false;
+    };
+  }, [providerId]);
 
   return {
-    availabilities,
+    availabilities: Array.isArray(availabilities) ? availabilities : [],
     loading,
     error,
-    getAvailabilities,
-    createAvailability,
-    updateAvailability,
-    deleteAvailability,
-    toggleAvailability,
-    setAvailabilities
+    providerId,
   };
-};
+}
